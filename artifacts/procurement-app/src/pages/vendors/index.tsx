@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Plus, Search, Filter, MoreHorizontal, Building2, MapPin, Mail, Phone, ExternalLink } from "lucide-react";
+import { Plus, Search, MoreHorizontal, ExternalLink, Building2 } from "lucide-react";
 import { useListVendors, useGetMe } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,127 +18,161 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+type StatusFilter = "all" | "active" | "inactive" | "pending";
+
 export function VendorsList() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const { data: vendors, isLoading } = useListVendors({ search: searchTerm });
   const { data: user } = useGetMe();
-  
   const isProcurementOfficer = user?.role === "procurement_officer" || user?.role === "admin";
 
+  const filtered = vendors?.filter((v) => {
+    if (statusFilter === "all") return true;
+    return v.status === statusFilter;
+  });
+
+  const tabCounts = {
+    all: vendors?.length ?? 0,
+    active: vendors?.filter((v) => v.status === "active").length ?? 0,
+    inactive: vendors?.filter((v) => v.status === "inactive").length ?? 0,
+    pending: vendors?.filter((v) => v.status === "pending").length ?? 0,
+  };
+
+  const tabs: { key: StatusFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "active", label: "Active" },
+    { key: "inactive", label: "Inactive" },
+    { key: "pending", label: "Pending" },
+  ];
+
+  const statusBadge = (status: string) => {
+    if (status === "active") return <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 font-normal text-xs">Active</Badge>;
+    if (status === "pending") return <Badge variant="outline" className="text-amber-600 border-amber-300 font-normal text-xs">Pending</Badge>;
+    return <Badge variant="secondary" className="font-normal text-xs capitalize">{status}</Badge>;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Vendors</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage supplier relationships and performance</p>
+          <h1 className="text-2xl font-bold tracking-tight">Vendors</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Manage supplier profiles and registrations
+          </p>
         </div>
         {isProcurementOfficer && (
           <Link href="/vendors/new">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" /> Register Vendor
+            <Button size="sm" className="gap-1.5">
+              <Plus className="h-3.5 w-3.5" /> Add Vendor
             </Button>
           </Link>
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
-        <div className="relative w-full sm:w-96">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search vendors by name, category..." 
-            className="pl-9 bg-background"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+        {/* Search & tabs */}
+        <div className="p-4 border-b border-border flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, category..."
+              className="pl-8 h-8 text-sm bg-muted/30"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-1 border border-border rounded-md p-0.5 bg-muted/30">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatusFilter(tab.key)}
+                className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                  statusFilter === tab.key
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+                <span className="ml-1.5 text-[10px] text-muted-foreground">
+                  {tabCounts[tab.key]}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button variant="outline" className="w-full sm:w-auto gap-2 bg-background">
-            <Filter className="h-4 w-4" /> Filter
-          </Button>
-        </div>
-      </div>
 
-      <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="w-[300px]">Vendor</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+          <TableHeader>
+            <TableRow className="bg-muted/30 hover:bg-muted/30">
+              <TableHead className="text-xs font-semibold">Company</TableHead>
+              <TableHead className="text-xs font-semibold">Category</TableHead>
+              <TableHead className="text-xs font-semibold">Contact</TableHead>
+              <TableHead className="text-xs font-semibold">Email</TableHead>
+              <TableHead className="text-xs font-semibold">FTS Status</TableHead>
+              <TableHead className="text-xs font-semibold">Rating</TableHead>
+              <TableHead className="text-right text-xs font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell><Skeleton className="h-5 w-48" /><Skeleton className="h-4 w-24 mt-1" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-12" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                  {Array.from({ length: 7 }).map((_, j) => (
+                    <TableCell key={j}><Skeleton className="h-4 w-24" /></TableCell>
+                  ))}
                 </TableRow>
               ))
-            ) : vendors?.length === 0 ? (
+            ) : filtered?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
+                  <Building2 className="h-8 w-8 mx-auto mb-2 opacity-30" />
                   No vendors found
                 </TableCell>
               </TableRow>
             ) : (
-              vendors?.map((vendor) => (
+              filtered?.map((vendor) => (
                 <TableRow key={vendor.id} className="hover:bg-muted/20 transition-colors">
                   <TableCell>
-                    <div className="font-medium text-foreground">{vendor.companyName}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                      <MapPin className="h-3 w-3" /> {vendor.address || 'No address'}
-                    </div>
+                    <div className="font-medium text-sm text-foreground">{vendor.companyName}</div>
+                    {vendor.address && (
+                      <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[180px]">
+                        {vendor.address}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className="font-normal text-xs">{vendor.category}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">{vendor.contactPerson}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{vendor.email}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={vendor.status === 'active' ? 'default' : vendor.status === 'pending' ? 'outline' : 'secondary'} 
-                           className={vendor.status === 'active' ? 'bg-emerald-600/10 text-emerald-600 hover:bg-emerald-600/20' : ''}>
-                      {vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1)}
+                    <Badge variant="secondary" className="font-normal text-xs">
+                      {vendor.category}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-sm">{vendor.contactPerson}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{vendor.email}</TableCell>
+                  <TableCell>{statusBadge(vendor.status)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1 text-sm font-medium">
-                      {vendor.rating ? (
-                        <>
-                          <span className="text-amber-500">★</span>
-                          {vendor.rating.toFixed(1)}
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">N/A</span>
-                      )}
-                    </div>
+                    {vendor.rating ? (
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <span className="text-amber-500">★</span>
+                        {vendor.rating.toFixed(1)}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <MoreHorizontal className="h-3.5 w-3.5" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <Link href={`/vendors/${vendor.id}`}>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <ExternalLink className="mr-2 h-4 w-4" /> View Details
+                          <DropdownMenuItem className="cursor-pointer text-sm">
+                            <ExternalLink className="mr-2 h-3.5 w-3.5" /> View Details
                           </DropdownMenuItem>
                         </Link>
                       </DropdownMenuContent>

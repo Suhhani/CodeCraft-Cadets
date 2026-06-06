@@ -1,118 +1,97 @@
 import { Link } from "wouter";
 import { Show } from "@clerk/react";
 import { Button } from "@/components/ui/button";
-
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+import { FileText, Users, ShoppingCart, CheckSquare } from "lucide-react";
 
 export function LandingPage() {
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary selection:text-primary-foreground">
-      <header className="px-6 h-16 flex items-center border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0">
-        <div className="flex items-center gap-2 font-bold text-lg tracking-tight text-foreground">
-          <div className="bg-primary p-1.5 rounded-md">
-            <img src={`${basePath}/logo.svg`} alt="Logo" className="w-5 h-5 text-primary-foreground stroke-current" />
+    <div className="min-h-[100dvh] flex flex-col bg-background">
+      <header className="px-6 h-14 flex items-center border-b border-border bg-card z-50 sticky top-0 shadow-sm">
+        <div className="flex items-center gap-2.5 font-bold text-base tracking-tight text-foreground">
+          <div className="bg-primary text-primary-foreground w-7 h-7 rounded-md flex items-center justify-center text-xs font-extrabold">
+            VB
           </div>
-          Procuris
+          VendorBridge
         </div>
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-3">
           <Show when="signed-out">
-            <Link href="/sign-in" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="/sign-in"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
               Sign in
             </Link>
             <Link href="/sign-up">
-              <Button>Get Started</Button>
+              <Button size="sm">Get Started</Button>
             </Link>
           </Show>
           <Show when="signed-in">
             <Link href="/dashboard">
-              <Button>Go to Dashboard</Button>
+              <Button size="sm">Open Dashboard</Button>
             </Link>
           </Show>
         </div>
       </header>
-      
+
       <main className="flex-1 flex flex-col">
-        <section className="w-full py-24 md:py-32 lg:py-48 flex items-center justify-center px-4 md:px-6 relative overflow-hidden">
-          {/* Subtle grid background */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
-          
-          <div className="container px-4 md:px-6 relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center">
-            <div className="inline-flex items-center rounded-full border border-border px-3 py-1 text-sm font-medium mb-8 bg-background">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
-              Enterprise-grade procurement
+        <section className="flex-1 flex items-center justify-center py-20 px-4 md:px-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808010_1px,transparent_1px),linear-gradient(to_bottom,#80808010_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+          <div className="max-w-4xl mx-auto text-center relative z-10">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs font-medium mb-6 bg-card">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Enterprise-grade procurement management
             </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-4xl leading-[1.1] mb-6">
-              Procurement software that <br className="hidden md:block" />
-              <span className="text-muted-foreground">actually works.</span>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground leading-tight mb-5">
+              Streamline your procurement
+              <br />
+              <span className="text-primary">end to end.</span>
             </h1>
-            
-            <p className="mx-auto max-w-[700px] text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed">
-              A powerful, no-nonsense platform for enterprise finance teams and vendors. 
-              Manage RFQs, quotations, approvals, and purchase orders with precision and control.
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+              Manage vendors, create RFQs, compare quotations, approve purchase orders
+              and track invoices — all in one platform built for finance teams.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Show when="signed-out">
                 <Link href="/sign-up">
-                  <Button size="lg" className="w-full sm:w-auto text-base px-8 h-12">
-                    Start optimizing now
-                  </Button>
+                  <Button size="lg" className="px-8 h-11">Get Started Free</Button>
                 </Link>
                 <Link href="/sign-in">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-8 h-12 bg-background">
-                    Sign in to your account
+                  <Button variant="outline" size="lg" className="px-8 h-11 bg-card">
+                    Sign in
                   </Button>
                 </Link>
               </Show>
               <Show when="signed-in">
                 <Link href="/dashboard">
-                  <Button size="lg" className="w-full sm:w-auto text-base px-8 h-12">
-                    Open Dashboard
-                  </Button>
+                  <Button size="lg" className="px-8 h-11">Open Dashboard</Button>
                 </Link>
               </Show>
             </div>
           </div>
         </section>
-        
-        <section className="w-full py-12 md:py-24 bg-muted/30 border-t border-border/50">
-          <div className="container px-4 md:px-6 mx-auto max-w-5xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-              <div className="space-y-3">
-                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-primary mb-5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+
+        <section className="py-16 px-4 md:px-6 border-t border-border bg-card">
+          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: Users, label: "Vendor Management", desc: "Maintain a rated, verified vendor registry" },
+              { icon: FileText, label: "RFQ Workflows", desc: "Multi-step RFQ creation with line items" },
+              { icon: ShoppingCart, label: "Purchase Orders", desc: "Auto-generate POs from winning quotes" },
+              { icon: CheckSquare, label: "Approval Engine", desc: "Configurable approval chains & audit logs" },
+            ].map(({ icon: Icon, label, desc }) => (
+              <div key={label} className="text-center space-y-2">
+                <div className="mx-auto w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-xl font-bold tracking-tight">Structured RFQs</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Create detailed Requests for Quotation with line items and specific deadlines. Assign vendors and track responses effortlessly.
-                </p>
+                <p className="font-semibold text-sm">{label}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
               </div>
-              <div className="space-y-3">
-                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-primary mb-5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
-                </div>
-                <h3 className="text-xl font-bold tracking-tight">Side-by-side comparison</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Evaluate vendor quotations side-by-side. Automatically highlight lowest prices and fastest delivery times to make informed decisions.
-                </p>
-              </div>
-              <div className="space-y-3">
-                <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-primary mb-5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                </div>
-                <h3 className="text-xl font-bold tracking-tight">Approval workflows</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Strict governance with multi-tier approval workflows for purchase orders and invoices. Maintain an immutable audit log.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
       </main>
-      
-      <footer className="w-full py-6 border-t border-border/50 flex flex-col items-center justify-center text-sm text-muted-foreground bg-background">
-        <p>© 2025 Procuris Systems. All rights reserved.</p>
+
+      <footer className="py-4 border-t border-border text-center text-xs text-muted-foreground bg-background">
+        © 2025 VendorBridge Systems. All rights reserved.
       </footer>
     </div>
   );
