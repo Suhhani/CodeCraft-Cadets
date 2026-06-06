@@ -3,13 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Procurement Management System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: vendors
+    description: Vendor management
+  - name: rfqs
+    description: Request for Quotation management
+  - name: quotations
+    description: Vendor quotation management
+  - name: approvals
+    description: Approval workflow management
+  - name: purchase-orders
+    description: Purchase order management
+  - name: invoices
+    description: Invoice management
+  - name: activity-logs
+    description: Activity logs and notifications
+  - name: reports
+    description: Reports and analytics
+
 paths:
   /healthz:
     get:
@@ -24,6 +43,790 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupInput"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout user
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      tags: [auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordInput"
+      responses:
+        "200":
+          description: Reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # Vendors
+  /vendors:
+    get:
+      operationId: listVendors
+      tags: [vendors]
+      summary: List all vendors
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of vendors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vendor"
+    post:
+      operationId: createVendor
+      tags: [vendors]
+      summary: Register a new vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorInput"
+      responses:
+        "201":
+          description: Vendor created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vendor"
+
+  /vendors/{id}:
+    get:
+      operationId: getVendor
+      tags: [vendors]
+      summary: Get vendor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vendor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vendor"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateVendor
+      tags: [vendors]
+      summary: Update vendor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorUpdate"
+      responses:
+        "200":
+          description: Updated vendor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vendor"
+    delete:
+      operationId: deleteVendor
+      tags: [vendors]
+      summary: Delete vendor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # RFQs
+  /rfqs:
+    get:
+      operationId: listRfqs
+      tags: [rfqs]
+      summary: List all RFQs
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of RFQs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rfq"
+    post:
+      operationId: createRfq
+      tags: [rfqs]
+      summary: Create a new RFQ
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RfqInput"
+      responses:
+        "201":
+          description: RFQ created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rfq"
+
+  /rfqs/{id}:
+    get:
+      operationId: getRfq
+      tags: [rfqs]
+      summary: Get RFQ by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: RFQ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rfq"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateRfq
+      tags: [rfqs]
+      summary: Update RFQ
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RfqUpdate"
+      responses:
+        "200":
+          description: Updated RFQ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rfq"
+    delete:
+      operationId: deleteRfq
+      tags: [rfqs]
+      summary: Delete RFQ
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /rfqs/{id}/quotations/compare:
+    get:
+      operationId: compareQuotations
+      tags: [rfqs]
+      summary: Compare quotations for an RFQ
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Comparison data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuotationComparison"
+
+  # Quotations
+  /quotations:
+    get:
+      operationId: listQuotations
+      tags: [quotations]
+      summary: List all quotations
+      parameters:
+        - name: rfqId
+          in: query
+          schema:
+            type: integer
+        - name: vendorId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of quotations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Quotation"
+    post:
+      operationId: createQuotation
+      tags: [quotations]
+      summary: Submit a quotation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuotationInput"
+      responses:
+        "201":
+          description: Quotation submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quotation"
+
+  /quotations/{id}:
+    get:
+      operationId: getQuotation
+      tags: [quotations]
+      summary: Get quotation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Quotation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quotation"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateQuotation
+      tags: [quotations]
+      summary: Update quotation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuotationUpdate"
+      responses:
+        "200":
+          description: Updated quotation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quotation"
+
+  # Approvals
+  /approvals:
+    get:
+      operationId: listApprovals
+      tags: [approvals]
+      summary: List approval requests
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of approvals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Approval"
+
+  /approvals/{id}/approve:
+    post:
+      operationId: approveRequest
+      tags: [approvals]
+      summary: Approve a request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalActionInput"
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Approval"
+
+  /approvals/{id}/reject:
+    post:
+      operationId: rejectRequest
+      tags: [approvals]
+      summary: Reject a request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalActionInput"
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Approval"
+
+  # Purchase Orders
+  /purchase-orders:
+    get:
+      operationId: listPurchaseOrders
+      tags: [purchase-orders]
+      summary: List all purchase orders
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of purchase orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PurchaseOrder"
+    post:
+      operationId: createPurchaseOrder
+      tags: [purchase-orders]
+      summary: Create a purchase order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrderInput"
+      responses:
+        "201":
+          description: Purchase order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseOrder"
+
+  /purchase-orders/{id}:
+    get:
+      operationId: getPurchaseOrder
+      tags: [purchase-orders]
+      summary: Get purchase order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Purchase order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseOrder"
+        "404":
+          description: Not found
+    patch:
+      operationId: updatePurchaseOrder
+      tags: [purchase-orders]
+      summary: Update purchase order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrderUpdate"
+      responses:
+        "200":
+          description: Updated purchase order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseOrder"
+
+  # Invoices
+  /invoices:
+    get:
+      operationId: listInvoices
+      tags: [invoices]
+      summary: List all invoices
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: purchaseOrderId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invoice"
+    post:
+      operationId: createInvoice
+      tags: [invoices]
+      summary: Generate an invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceInput"
+      responses:
+        "201":
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+
+  /invoices/{id}:
+    get:
+      operationId: getInvoice
+      tags: [invoices]
+      summary: Get invoice by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Invoice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateInvoice
+      tags: [invoices]
+      summary: Update invoice status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceUpdate"
+      responses:
+        "200":
+          description: Updated invoice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+
+  /invoices/{id}/send-email:
+    post:
+      operationId: sendInvoiceEmail
+      tags: [invoices]
+      summary: Send invoice via email
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # Activity Logs
+  /activity-logs:
+    get:
+      operationId: listActivityLogs
+      tags: [activity-logs]
+      summary: List activity logs
+      parameters:
+        - name: entityType
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Activity logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityLog"
+
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [activity-logs]
+      summary: List notifications for current user
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [activity-logs]
+      summary: Mark notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
+  # Reports
+  /reports/dashboard-summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [reports]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /reports/vendor-performance:
+    get:
+      operationId: getVendorPerformance
+      tags: [reports]
+      summary: Get vendor performance analytics
+      responses:
+        "200":
+          description: Vendor performance data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VendorPerformance"
+
+  /reports/spending-summary:
+    get:
+      operationId: getSpendingSummary
+      tags: [reports]
+      summary: Get spending summary
+      responses:
+        "200":
+          description: Spending summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpendingSummary"
+
+  /reports/monthly-trends:
+    get:
+      operationId: getMonthlyTrends
+      tags: [reports]
+      summary: Get monthly procurement trends
+      responses:
+        "200":
+          description: Monthly trends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyTrend"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +837,764 @@ components:
       required:
         - status
 
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    # Auth schemas
+    SignupInput:
+      type: object
+      required: [name, email, password, role]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        role:
+          type: string
+          enum: [procurement_officer, vendor]
+        companyName:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    ForgotPasswordInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required:
+        - user
+        - token
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [procurement_officer, vendor, admin]
+        companyName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - role
+        - createdAt
+
+    # Vendor schemas
+    Vendor:
+      type: object
+      properties:
+        id:
+          type: integer
+        companyName:
+          type: string
+        contactPerson:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: ["string", "null"]
+        gstNumber:
+          type: ["string", "null"]
+        category:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, pending]
+        rating:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - companyName
+        - contactPerson
+        - email
+        - phone
+        - category
+        - status
+        - createdAt
+
+    VendorInput:
+      type: object
+      required: [companyName, contactPerson, email, phone, category]
+      properties:
+        companyName:
+          type: string
+        contactPerson:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        gstNumber:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, pending]
+
+    VendorUpdate:
+      type: object
+      properties:
+        companyName:
+          type: string
+        contactPerson:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        gstNumber:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, pending]
+        rating:
+          type: number
+
+    # RFQ schemas
+    RfqItem:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        quantity:
+          type: number
+        unit:
+          type: string
+      required:
+        - name
+        - quantity
+        - unit
+
+    Rfq:
+      type: object
+      properties:
+        id:
+          type: integer
+        rfqNumber:
+          type: string
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RfqItem"
+        deadline:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [draft, open, closed, awarded, cancelled]
+        assignedVendorIds:
+          type: array
+          items:
+            type: integer
+        createdById:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rfqNumber
+        - title
+        - items
+        - deadline
+        - status
+        - assignedVendorIds
+        - createdById
+        - createdAt
+
+    RfqInput:
+      type: object
+      required: [title, items, deadline, assignedVendorIds]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RfqItem"
+        deadline:
+          type: string
+          format: date-time
+        assignedVendorIds:
+          type: array
+          items:
+            type: integer
+
+    RfqUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RfqItem"
+        deadline:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [draft, open, closed, awarded, cancelled]
+        assignedVendorIds:
+          type: array
+          items:
+            type: integer
+
+    # Quotation schemas
+    QuotationItem:
+      type: object
+      properties:
+        rfqItemName:
+          type: string
+        unitPrice:
+          type: number
+        quantity:
+          type: number
+        totalPrice:
+          type: number
+      required:
+        - rfqItemName
+        - unitPrice
+        - quantity
+        - totalPrice
+
+    Quotation:
+      type: object
+      properties:
+        id:
+          type: integer
+        rfqId:
+          type: integer
+        vendorId:
+          type: integer
+        vendorName:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuotationItem"
+        totalAmount:
+          type: number
+        deliveryTimeline:
+          type: string
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [submitted, under_review, accepted, rejected]
+        submittedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rfqId
+        - vendorId
+        - vendorName
+        - items
+        - totalAmount
+        - deliveryTimeline
+        - status
+        - submittedAt
+
+    QuotationInput:
+      type: object
+      required: [rfqId, vendorId, items, totalAmount, deliveryTimeline]
+      properties:
+        rfqId:
+          type: integer
+        vendorId:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuotationItem"
+        totalAmount:
+          type: number
+        deliveryTimeline:
+          type: string
+        notes:
+          type: string
+
+    QuotationUpdate:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuotationItem"
+        totalAmount:
+          type: number
+        deliveryTimeline:
+          type: string
+        notes:
+          type: string
+        status:
+          type: string
+          enum: [submitted, under_review, accepted, rejected]
+
+    QuotationComparison:
+      type: object
+      properties:
+        rfqId:
+          type: integer
+        rfqTitle:
+          type: string
+        quotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Quotation"
+        lowestPriceVendorId:
+          type: ["integer", "null"]
+        fastestDeliveryVendorId:
+          type: ["integer", "null"]
+      required:
+        - rfqId
+        - rfqTitle
+        - quotations
+
+    # Approval schemas
+    Approval:
+      type: object
+      properties:
+        id:
+          type: integer
+        entityType:
+          type: string
+          enum: [rfq, purchase_order, quotation]
+        entityId:
+          type: integer
+        entityTitle:
+          type: string
+        requestedById:
+          type: integer
+        requestedByName:
+          type: string
+        approverId:
+          type: ["integer", "null"]
+        approverName:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        remarks:
+          type: ["string", "null"]
+        requestedAt:
+          type: string
+          format: date-time
+        actionedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - entityType
+        - entityId
+        - entityTitle
+        - requestedById
+        - requestedByName
+        - status
+        - requestedAt
+
+    ApprovalActionInput:
+      type: object
+      required: [remarks]
+      properties:
+        remarks:
+          type: string
+
+    # Purchase Order schemas
+    PurchaseOrderItem:
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+        unitPrice:
+          type: number
+        totalPrice:
+          type: number
+      required:
+        - name
+        - quantity
+        - unit
+        - unitPrice
+        - totalPrice
+
+    PurchaseOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+        poNumber:
+          type: string
+        rfqId:
+          type: ["integer", "null"]
+        quotationId:
+          type: ["integer", "null"]
+        vendorId:
+          type: integer
+        vendorName:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PurchaseOrderItem"
+        subtotal:
+          type: number
+        taxRate:
+          type: number
+        taxAmount:
+          type: number
+        totalAmount:
+          type: number
+        status:
+          type: string
+          enum: [draft, sent, acknowledged, delivered, completed, cancelled]
+        deliveryDate:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - poNumber
+        - vendorId
+        - vendorName
+        - items
+        - subtotal
+        - taxRate
+        - taxAmount
+        - totalAmount
+        - status
+        - createdAt
+
+    PurchaseOrderInput:
+      type: object
+      required: [vendorId, items, taxRate]
+      properties:
+        rfqId:
+          type: integer
+        quotationId:
+          type: integer
+        vendorId:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PurchaseOrderItem"
+        taxRate:
+          type: number
+        deliveryDate:
+          type: string
+          format: date-time
+
+    PurchaseOrderUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [draft, sent, acknowledged, delivered, completed, cancelled]
+        deliveryDate:
+          type: string
+          format: date-time
+
+    # Invoice schemas
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        invoiceNumber:
+          type: string
+        purchaseOrderId:
+          type: integer
+        poNumber:
+          type: string
+        vendorId:
+          type: integer
+        vendorName:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PurchaseOrderItem"
+        subtotal:
+          type: number
+        taxRate:
+          type: number
+        taxAmount:
+          type: number
+        totalAmount:
+          type: number
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue, cancelled]
+        dueDate:
+          type: string
+          format: date-time
+        paidAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - invoiceNumber
+        - purchaseOrderId
+        - poNumber
+        - vendorId
+        - vendorName
+        - items
+        - subtotal
+        - taxRate
+        - taxAmount
+        - totalAmount
+        - status
+        - dueDate
+        - createdAt
+
+    InvoiceInput:
+      type: object
+      required: [purchaseOrderId, dueDate]
+      properties:
+        purchaseOrderId:
+          type: integer
+        dueDate:
+          type: string
+          format: date-time
+
+    InvoiceUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue, cancelled]
+        paidAt:
+          type: string
+          format: date-time
+
+    # Activity Log schemas
+    ActivityLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: ["integer", "null"]
+        userName:
+          type: ["string", "null"]
+        action:
+          type: string
+        entityType:
+          type: string
+        entityId:
+          type: ["integer", "null"]
+        entityTitle:
+          type: ["string", "null"]
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - action
+        - entityType
+        - description
+        - createdAt
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+          enum: [rfq, approval, invoice, purchase_order, general]
+        isRead:
+          type: boolean
+        entityId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - title
+        - message
+        - type
+        - isRead
+        - createdAt
+
+    # Report schemas
+    DashboardSummary:
+      type: object
+      properties:
+        pendingApprovals:
+          type: integer
+        activeRfqs:
+          type: integer
+        recentPurchaseOrders:
+          type: integer
+        recentInvoices:
+          type: integer
+        totalSpend:
+          type: number
+        vendorCount:
+          type: integer
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityLog"
+      required:
+        - pendingApprovals
+        - activeRfqs
+        - recentPurchaseOrders
+        - recentInvoices
+        - totalSpend
+        - vendorCount
+        - recentActivity
+
+    VendorPerformance:
+      type: object
+      properties:
+        vendorId:
+          type: integer
+        vendorName:
+          type: string
+        totalOrders:
+          type: integer
+        totalSpend:
+          type: number
+        avgDeliveryDays:
+          type: ["number", "null"]
+        rating:
+          type: ["number", "null"]
+        onTimeDeliveryRate:
+          type: number
+      required:
+        - vendorId
+        - vendorName
+        - totalOrders
+        - totalSpend
+        - onTimeDeliveryRate
+
+    SpendingSummary:
+      type: object
+      properties:
+        totalSpend:
+          type: number
+        byCategory:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              amount:
+                type: number
+            required: [category, amount]
+        byVendor:
+          type: array
+          items:
+            type: object
+            properties:
+              vendorName:
+                type: string
+              amount:
+                type: number
+            required: [vendorName, amount]
+      required:
+        - totalSpend
+        - byCategory
+        - byVendor
+
+    MonthlyTrend:
+      type: object
+      properties:
+        month:
+          type: string
+        rfqCount:
+          type: integer
+        poCount:
+          type: integer
+        totalSpend:
+          type: number
+        invoiceCount:
+          type: integer
+      required:
+        - month
+        - rfqCount
+        - poCount
+        - totalSpend
+        - invoiceCount

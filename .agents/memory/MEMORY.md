@@ -1,0 +1,1 @@
+- [Clerk themes install](clerk-themes-install.md) — @clerk/themes must be installed separately; design subagents won't always do it, causing Vite import errors
