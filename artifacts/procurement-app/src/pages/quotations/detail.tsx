@@ -94,8 +94,8 @@ export function QuotationDetail() {
                     <TableRow key={idx}>
                       <TableCell className="font-medium">{item.rfqItemName}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell className="text-right">${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</TableCell>
-                      <TableCell className="text-right font-medium">${item.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</TableCell>
+                      <TableCell className="text-right">₹{item.unitPrice.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</TableCell>
+                      <TableCell className="text-right font-medium">₹{item.totalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -104,7 +104,7 @@ export function QuotationDetail() {
             
             <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg border">
               <span className="font-semibold text-lg">Total Amount</span>
-              <span className="font-bold text-2xl">${quotation.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              <span className="font-bold text-2xl">₹{quotation.totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
             </div>
           </CardContent>
         </Card>

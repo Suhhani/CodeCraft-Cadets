@@ -115,7 +115,7 @@ export function PurchaseOrdersList() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="font-medium">${po.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="font-medium">₹{po.totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={`font-medium ${getStatusColor(po.status)}`}>

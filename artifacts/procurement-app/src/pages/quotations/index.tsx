@@ -82,7 +82,7 @@ export function QuotationsList() {
                     </TableCell>
                   )}
                   <TableCell className="text-right">
-                    <div className="font-semibold">${q.totalAmount.toLocaleString()}</div>
+                    <div className="font-semibold">₹{q.totalAmount.toLocaleString("en-IN")}</div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">{q.deliveryTimeline}</div>

@@ -107,7 +107,7 @@ export function InvoicesList() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="font-medium">${invoice.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="font-medium">₹{invoice.totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={`font-medium ${getStatusColor(invoice.status)}`}>
