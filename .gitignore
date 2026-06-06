@@ -1,6 +1,6 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# compiled output
+# Compiled output
 dist
 tmp
 out-tsc
@@ -8,7 +8,7 @@ out-tsc
 .expo
 .expo-shared
 
-# dependencies
+# Dependencies
 node_modules
 
 # IDEs and editors
@@ -27,7 +27,7 @@ node_modules
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# misc
+# Misc
 /.sass-cache
 /connect.lock
 /coverage
@@ -41,9 +41,13 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
-# Replit
+# Replit platform files (not needed on GitHub)
 .cache/
 .local/
+.agents/
+attached_assets/
+.replit
+.replitignore
+
+# Temporary / scratch files
+**/temp.ts
