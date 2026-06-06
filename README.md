@@ -164,6 +164,7 @@ Entities: `users` · `vendors` · `rfqs` · `rfq_items` · `quotations` · `quot
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+https://web-structure-manager--suhanibavaghela.replit.app
 
 ---
 
