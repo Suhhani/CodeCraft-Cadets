@@ -5,20 +5,12 @@ import { useListVendors, useGetMe } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 type StatusFilter = "all" | "active" | "inactive" | "pending";
@@ -30,10 +22,9 @@ export function VendorsList() {
   const { data: user } = useGetMe();
   const isProcurementOfficer = user?.role === "procurement_officer" || user?.role === "admin";
 
-  const filtered = vendors?.filter((v) => {
-    if (statusFilter === "all") return true;
-    return v.status === statusFilter;
-  });
+  const filtered = vendors?.filter((v) =>
+    statusFilter === "all" ? true : v.status === statusFilter
+  );
 
   const tabCounts = {
     all: vendors?.length ?? 0,
@@ -60,9 +51,7 @@ export function VendorsList() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Vendors</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Manage supplier profiles and registrations
-          </p>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage supplier profiles and registrations</p>
         </div>
         {isProcurementOfficer && (
           <Link href="/vendors/new">
@@ -74,7 +63,6 @@ export function VendorsList() {
       </div>
 
       <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-        {/* Search & tabs */}
         <div className="p-4 border-b border-border flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -97,9 +85,7 @@ export function VendorsList() {
                 }`}
               >
                 {tab.label}
-                <span className="ml-1.5 text-[10px] text-muted-foreground">
-                  {tabCounts[tab.key]}
-                </span>
+                <span className="ml-1.5 text-[10px] text-muted-foreground">{tabCounts[tab.key]}</span>
               </button>
             ))}
           </div>
@@ -110,9 +96,10 @@ export function VendorsList() {
             <TableRow className="bg-muted/30 hover:bg-muted/30">
               <TableHead className="text-xs font-semibold">Company</TableHead>
               <TableHead className="text-xs font-semibold">Category</TableHead>
+              <TableHead className="text-xs font-semibold">GST No.</TableHead>
               <TableHead className="text-xs font-semibold">Contact</TableHead>
               <TableHead className="text-xs font-semibold">Email</TableHead>
-              <TableHead className="text-xs font-semibold">FTS Status</TableHead>
+              <TableHead className="text-xs font-semibold">Status</TableHead>
               <TableHead className="text-xs font-semibold">Rating</TableHead>
               <TableHead className="text-right text-xs font-semibold">Actions</TableHead>
             </TableRow>
@@ -121,14 +108,14 @@ export function VendorsList() {
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 7 }).map((_, j) => (
-                    <TableCell key={j}><Skeleton className="h-4 w-24" /></TableCell>
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <TableCell key={j}><Skeleton className="h-4 w-20" /></TableCell>
                   ))}
                 </TableRow>
               ))
             ) : filtered?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-sm">
                   <Building2 className="h-8 w-8 mx-auto mb-2 opacity-30" />
                   No vendors found
                 </TableCell>
@@ -139,15 +126,16 @@ export function VendorsList() {
                   <TableCell>
                     <div className="font-medium text-sm text-foreground">{vendor.companyName}</div>
                     {vendor.address && (
-                      <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[180px]">
-                        {vendor.address}
-                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-[180px]">{vendor.address}</div>
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className="font-normal text-xs">
-                      {vendor.category}
-                    </Badge>
+                    <Badge variant="secondary" className="font-normal text-xs">{vendor.category}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {vendor.gstNumber || <span className="text-muted-foreground/50">—</span>}
+                    </span>
                   </TableCell>
                   <TableCell className="text-sm">{vendor.contactPerson}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{vendor.email}</TableCell>
