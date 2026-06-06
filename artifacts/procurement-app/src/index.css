@@ -75,50 +75,54 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* VendorBridge Green theme */
-  --background: 0 0% 97%;
-  --foreground: 224 71% 4%;
+  /* === Procuris Enterprise Navy Blue Theme === */
 
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 142 71% 45%;
+  /* Base */
+  --background: 216 24% 96%;
+  --foreground: 222 47% 11%;
 
+  --border: 217 22% 89%;
+  --input: 217 22% 89%;
+  --ring: 221 83% 53%;
+
+  /* Cards — pure white with soft border */
   --card: 0 0% 100%;
-  --card-foreground: 224 71% 4%;
-  --card-border: 220 13% 91%;
+  --card-foreground: 222 47% 11%;
+  --card-border: 217 22% 91%;
 
-  /* White sidebar with dark text */
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 224 71% 4%;
-  --sidebar-border: 220 13% 91%;
-  --sidebar-primary: 142 71% 45%;
+  /* Dark navy sidebar */
+  --sidebar: 222 47% 11%;
+  --sidebar-foreground: 215 20% 78%;
+  --sidebar-border: 222 47% 17%;
+  --sidebar-primary: 217 91% 60%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 142 76% 95%;
-  --sidebar-accent-foreground: 142 76% 25%;
-  --sidebar-ring: 142 71% 45%;
+  --sidebar-accent: 217 35% 20%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-ring: 217 91% 60%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 224 71% 4%;
-  --popover-border: 220 13% 91%;
+  --popover-foreground: 222 47% 11%;
+  --popover-border: 217 22% 91%;
 
-  /* Green primary */
-  --primary: 142 71% 45%;
+  /* Blue primary (replaces green) */
+  --primary: 221 83% 53%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 220 14% 96%;
-  --secondary-foreground: 224 71% 4%;
+  --secondary: 216 24% 94%;
+  --secondary-foreground: 222 47% 11%;
 
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 46%;
+  --muted: 216 24% 94%;
+  --muted-foreground: 220 9% 48%;
 
-  --accent: 142 76% 95%;
-  --accent-foreground: 142 76% 25%;
+  --accent: 214 95% 93%;
+  --accent-foreground: 221 83% 32%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 142 71% 45%;
-  --chart-2: 200 98% 39%;
+  /* Chart palette — blue-anchored */
+  --chart-1: 221 83% 53%;
+  --chart-2: 142 71% 45%;
   --chart-3: 262 83% 58%;
   --chart-4: 43 96% 56%;
   --chart-5: 0 84% 60%;
@@ -126,17 +130,17 @@
   --app-font-sans: 'Inter', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: 'JetBrains Mono', Menlo, monospace;
-  --radius: 0.4rem;
+  --radius: 0.5rem;
 
-  --shadow-2xs: 0px 1px 2px 0px rgba(0,0,0, 0.05);
-  --shadow-xs: 0px 1px 2px 0px rgba(0,0,0, 0.05);
-  --shadow-sm: 0px 1px 3px 0px rgba(0,0,0, 0.08), 0px 1px 2px -1px rgba(0,0,0, 0.08);
-  --shadow: 0px 1px 3px 0px rgba(0,0,0, 0.08), 0px 1px 2px -1px rgba(0,0,0, 0.08);
-  --shadow-md: 0px 4px 6px -1px rgba(0,0,0, 0.08), 0px 2px 4px -2px rgba(0,0,0, 0.08);
-  --shadow-lg: 0px 10px 15px -3px rgba(0,0,0, 0.08), 0px 4px 6px -4px rgba(0,0,0, 0.08);
-  --shadow-xl: 0px 20px 25px -5px rgba(0,0,0, 0.08), 0px 8px 10px -6px rgba(0,0,0, 0.08);
-  --shadow-2xl: 0px 25px 50px -12px rgba(0,0,0, 0.18);
-  --tracking-normal: -0.01em;
+  --shadow-2xs: 0px 1px 2px 0px rgba(15,23,42,0.04);
+  --shadow-xs:  0px 1px 2px 0px rgba(15,23,42,0.06);
+  --shadow-sm:  0px 1px 3px 0px rgba(15,23,42,0.08), 0px 1px 2px -1px rgba(15,23,42,0.06);
+  --shadow:     0px 2px 4px 0px rgba(15,23,42,0.08), 0px 1px 2px -1px rgba(15,23,42,0.06);
+  --shadow-md:  0px 4px 8px -1px rgba(15,23,42,0.10), 0px 2px 4px -2px rgba(15,23,42,0.06);
+  --shadow-lg:  0px 10px 20px -3px rgba(15,23,42,0.10), 0px 4px 8px -4px rgba(15,23,42,0.06);
+  --shadow-xl:  0px 20px 30px -5px rgba(15,23,42,0.10), 0px 8px 12px -6px rgba(15,23,42,0.06);
+  --shadow-2xl: 0px 25px 50px -12px rgba(15,23,42,0.20);
+  --tracking-normal: -0.015em;
   --spacing: 0.25rem;
 
   --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
@@ -154,6 +158,12 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    letter-spacing: var(--tracking-normal);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
+    font-feature-settings: "cv11", "ss01";
   }
 }
 
@@ -166,6 +176,47 @@
     color: hsl(var(--muted-foreground));
     pointer-events: none;
   }
+
+  /* Sidebar gradient background */
+  .sidebar-gradient {
+    background: linear-gradient(180deg,
+      hsl(222 47% 13%) 0%,
+      hsl(222 47% 10%) 100%
+    );
+  }
+
+  /* Active sidebar item — left accent bar + blue glow */
+  .sidebar-item-active {
+    background: linear-gradient(90deg,
+      rgba(96,165,250,0.12) 0%,
+      rgba(96,165,250,0.04) 100%
+    );
+    border-left: 2px solid hsl(217 91% 65%);
+  }
+
+  .sidebar-item-inactive {
+    border-left: 2px solid transparent;
+  }
+
+  .sidebar-item-inactive:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Card accent strip */
+  .card-accent-blue  { border-top: 3px solid hsl(221 83% 53%); }
+  .card-accent-green { border-top: 3px solid hsl(142 71% 45%); }
+  .card-accent-amber { border-top: 3px solid hsl(43 96% 56%);  }
+  .card-accent-purple{ border-top: 3px solid hsl(262 83% 58%); }
+  .card-accent-red   { border-top: 3px solid hsl(0 84% 60%);   }
+
+  /* Subtle page header gradient */
+  .page-header-gradient {
+    background: linear-gradient(135deg,
+      hsl(221 83% 53% / 0.06) 0%,
+      transparent 60%
+    );
+  }
+
   .no-default-hover-elevate {}
   .no-default-active-elevate {}
   .toggle-elevate::before,

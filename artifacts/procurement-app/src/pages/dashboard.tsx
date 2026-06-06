@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Users,
   TrendingUp,
+  Clock,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -29,40 +30,46 @@ export function DashboardPage() {
     return `₹${amount}`;
   };
 
+  const today = new Date();
+  const greeting =
+    today.getHours() < 12 ? "Good morning" :
+    today.getHours() < 17 ? "Good afternoon" : "Good evening";
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {greeting}, {user?.name?.split(" ")[0] || "there"} 👋
+          </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Welcome back, {user?.name || "User"} — Today's Overview
+            {format(today, "EEEE, MMMM d, yyyy")} · Procurement Overview
           </p>
         </div>
-        <div className="flex gap-2">
-          {isProcurementOfficer && (
-            <>
-              <Link href="/rfqs/new">
-                <Button size="sm" className="gap-1.5">
-                  <Plus className="h-3.5 w-3.5" /> New RFQ
-                </Button>
-              </Link>
-              <Link href="/vendors/new">
-                <Button variant="outline" size="sm" className="gap-1.5 bg-card">
-                  <Users className="h-3.5 w-3.5" /> Add Vendor
-                </Button>
-              </Link>
-              <Link href="/purchase-orders/new">
-                <Button variant="outline" size="sm" className="gap-1.5 bg-card">
-                  <ShoppingCart className="h-3.5 w-3.5" /> New PO
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
+        {isProcurementOfficer && (
+          <div className="flex flex-wrap gap-2">
+            <Link href="/rfqs/new">
+              <Button size="sm" className="gap-1.5 shadow-sm">
+                <Plus className="h-3.5 w-3.5" /> New RFQ
+              </Button>
+            </Link>
+            <Link href="/vendors/new">
+              <Button variant="outline" size="sm" className="gap-1.5 bg-white">
+                <Users className="h-3.5 w-3.5" /> Add Vendor
+              </Button>
+            </Link>
+            <Link href="/purchase-orders/new">
+              <Button variant="outline" size="sm" className="gap-1.5 bg-white">
+                <ShoppingCart className="h-3.5 w-3.5" /> New PO
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
-      {/* Metric cards */}
+      {/* KPI metric cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Open RFQs"
@@ -70,7 +77,8 @@ export function DashboardPage() {
           icon={FileText}
           isLoading={isLoading}
           href="/rfqs"
-          color="green"
+          accent="blue"
+          formatter={(v) => String(v)}
         />
         <MetricCard
           title="Pending Approvals"
@@ -78,7 +86,8 @@ export function DashboardPage() {
           icon={CheckSquare}
           isLoading={isLoading}
           href="/approvals"
-          color="amber"
+          accent="amber"
+          formatter={(v) => String(v)}
         />
         <MetricCard
           title="Total Spend"
@@ -86,7 +95,7 @@ export function DashboardPage() {
           icon={TrendingUp}
           isLoading={isLoading}
           href="/reports"
-          color="blue"
+          accent="green"
           formatter={formatCurrency}
         />
         <MetricCard
@@ -95,23 +104,28 @@ export function DashboardPage() {
           icon={Users}
           isLoading={isLoading}
           href="/vendors"
-          color="purple"
+          accent="purple"
+          formatter={(v) => String(v)}
         />
       </div>
 
-      {/* Content grid */}
+      {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
         {/* Recent Activity */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 pt-5 px-5">
-            <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+        <Card className="lg:col-span-2 shadow-sm border-border/70">
+          <CardHeader className="flex flex-row items-center justify-between pb-3 pt-5 px-5 border-b border-border/50">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-[15px] font-semibold">Recent Activity</CardTitle>
+            </div>
             <Link href="/activity-logs">
-              <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground">
+              <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground hover:text-primary">
                 View all <ArrowRight className="h-3 w-3" />
               </Button>
             </Link>
           </CardHeader>
-          <CardContent className="px-5 pb-5">
+          <CardContent className="px-5 pb-5 pt-4">
             {isLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
@@ -125,19 +139,19 @@ export function DashboardPage() {
                 ))}
               </div>
             ) : summary?.recentActivity && summary.recentActivity.length > 0 ? (
-              <div className="space-y-4">
-                {summary.recentActivity.slice(0, 7).map((activity) => (
-                  <div key={activity.id} className="flex gap-3">
-                    <div className="mt-0.5 h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+              <div className="divide-y divide-border/40">
+                {summary.recentActivity.slice(0, 7).map((activity, idx) => (
+                  <div key={activity.id} className={`flex gap-3 ${idx === 0 ? "pb-3.5" : "py-3.5"}`}>
+                    <div className="mt-0.5 h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
                       <FileText className="h-3.5 w-3.5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-foreground leading-snug">
-                        <span className="font-medium">{activity.userName}</span>
-                        {" — "}
+                      <p className="text-[13px] text-foreground leading-snug">
+                        <span className="font-semibold">{activity.userName}</span>
+                        <span className="text-muted-foreground"> — </span>
                         {activity.description}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
                         {format(new Date(activity.createdAt), "MMM d, yyyy 'at' h:mm a")}
                       </p>
                     </div>
@@ -145,21 +159,24 @@ export function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <p className="py-6 text-center text-sm text-muted-foreground">No recent activity found.</p>
+              <div className="py-10 text-center">
+                <Clock className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No recent activity found.</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Quick Actions */}
-        <Card>
-          <CardHeader className="pb-3 pt-5 px-5">
-            <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
+        <Card className="shadow-sm border-border/70">
+          <CardHeader className="pb-3 pt-5 px-5 border-b border-border/50">
+            <CardTitle className="text-[15px] font-semibold">Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent className="px-5 pb-5 space-y-2">
+          <CardContent className="px-4 pb-5 pt-4 space-y-1.5">
             {isProcurementOfficer ? (
               <>
-                <QuickActionLink href="/vendors/new" icon={Users} label="Register New Vendor" />
-                <QuickActionLink href="/rfqs/new" icon={FileText} label="Create RFQ" />
+                <QuickActionLink href="/vendors/new"       icon={Users}       label="Register New Vendor" />
+                <QuickActionLink href="/rfqs/new"          icon={FileText}    label="Create RFQ" />
                 <QuickActionLink href="/purchase-orders/new" icon={ShoppingCart} label="Draft Purchase Order" />
                 <QuickActionLink
                   href="/approvals"
@@ -167,41 +184,49 @@ export function DashboardPage() {
                   label="Review Approvals"
                   badge={summary?.pendingApprovals}
                 />
-                <QuickActionLink href="/reports" icon={TrendingUp} label="View Reports" />
+                <QuickActionLink href="/reports"           icon={TrendingUp}  label="View Reports" />
               </>
             ) : (
               <>
-                <QuickActionLink href="/rfqs" icon={FileText} label="View Open RFQs" />
-                <QuickActionLink href="/quotations/new" icon={MessageSquare} label="Submit Quotation" />
-                <QuickActionLink href="/invoices" icon={Receipt} label="Manage Invoices" />
+                <QuickActionLink href="/rfqs"              icon={FileText}    label="View Open RFQs" />
+                <QuickActionLink href="/quotations/new"    icon={MessageSquare} label="Submit Quotation" />
+                <QuickActionLink href="/invoices"          icon={Receipt}     label="Manage Invoices" />
               </>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: "Purchase Orders", value: summary?.recentPurchaseOrders ?? 0, href: "/purchase-orders", icon: ShoppingCart },
-          { label: "Invoices", value: summary?.recentInvoices ?? 0, href: "/invoices", icon: Receipt },
-          { label: "Quotations", value: 0, href: "/quotations", icon: MessageSquare },
-          { label: "Vendors", value: summary?.vendorCount ?? 0, href: "/vendors", icon: Users },
-        ].map(({ label, value, href, icon: Icon }) => (
-          <Link key={label} href={href} className="block">
-            <div className="bg-card border border-border rounded-lg p-4 hover:border-primary/40 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-muted-foreground font-medium">{label}</p>
-                <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+      {/* Stats mini-cards */}
+      <div>
+        <h2 className="text-sm font-semibold text-muted-foreground mb-3 tracking-wide uppercase text-[11px]">
+          Module Overview
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Purchase Orders", value: summary?.recentPurchaseOrders ?? 0, href: "/purchase-orders", icon: ShoppingCart, color: "text-blue-600 bg-blue-50" },
+            { label: "Invoices",        value: summary?.recentInvoices ?? 0,        href: "/invoices",        icon: Receipt,      color: "text-green-600 bg-green-50" },
+            { label: "Quotations",      value: 0,                                   href: "/quotations",      icon: MessageSquare, color: "text-purple-600 bg-purple-50" },
+            { label: "Vendors",         value: summary?.vendorCount ?? 0,           href: "/vendors",         icon: Users,        color: "text-amber-600 bg-amber-50" },
+          ].map(({ label, value, href, icon: Icon, color }) => (
+            <Link key={label} href={href} className="block group">
+              <div className="bg-white border border-border/70 rounded-xl p-4 hover:border-primary/40 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center justify-between mb-3">
+                  <div className={`p-2 rounded-lg ${color}`}>
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                </div>
+                {isLoading ? (
+                  <Skeleton className="h-7 w-10" />
+                ) : (
+                  <p className="text-2xl font-bold text-foreground">{value}</p>
+                )}
+                <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{label}</p>
               </div>
-              {isLoading ? (
-                <Skeleton className="h-7 w-10" />
-              ) : (
-                <p className="text-2xl font-bold text-foreground">{value}</p>
-              )}
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -213,7 +238,7 @@ function MetricCard({
   icon: Icon,
   isLoading,
   href,
-  color = "green",
+  accent = "blue",
   formatter,
 }: {
   title: string;
@@ -221,35 +246,35 @@ function MetricCard({
   icon: React.ElementType;
   isLoading: boolean;
   href: string;
-  color?: "green" | "amber" | "blue" | "purple";
+  accent?: "blue" | "amber" | "green" | "purple";
   formatter?: (v: number) => string;
 }) {
-  const colorMap = {
-    green: "bg-green-50 text-green-600 border-green-100",
-    amber: "bg-amber-50 text-amber-600 border-amber-100",
-    blue: "bg-blue-50 text-blue-600 border-blue-100",
-    purple: "bg-purple-50 text-purple-600 border-purple-100",
+  const accentConfig = {
+    blue:   { bar: "card-accent-blue",   icon: "bg-blue-50 text-blue-600",   trend: "text-blue-600" },
+    amber:  { bar: "card-accent-amber",  icon: "bg-amber-50 text-amber-600", trend: "text-amber-600" },
+    green:  { bar: "card-accent-green",  icon: "bg-green-50 text-green-600", trend: "text-green-600" },
+    purple: { bar: "card-accent-purple", icon: "bg-purple-50 text-purple-600", trend: "text-purple-600" },
   };
+  const cfg = accentConfig[accent];
   const display = formatter ? formatter(value ?? 0) : String(value ?? 0);
+
   return (
-    <Link href={href} className="block">
-      <Card className="hover:border-primary/40 transition-colors cursor-pointer">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1.5">{title}</p>
-              {isLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <p className="text-3xl font-bold tracking-tight text-foreground">{display}</p>
-              )}
-            </div>
-            <div className={`p-2.5 rounded-lg border ${colorMap[color]}`}>
-              <Icon className="h-4 w-4" />
+    <Link href={href} className="block group">
+      <div className={`bg-white border border-border/70 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 ${cfg.bar}`}>
+        <div className="p-5">
+          <div className="flex items-start justify-between mb-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{title}</p>
+            <div className={`p-2 rounded-lg ${cfg.icon}`}>
+              <Icon className="h-3.5 w-3.5" />
             </div>
           </div>
-        </CardContent>
-      </Card>
+          {isLoading ? (
+            <Skeleton className="h-9 w-20" />
+          ) : (
+            <p className="text-3xl font-bold tracking-tight text-foreground">{display}</p>
+          )}
+        </div>
+      </div>
     </Link>
   );
 }
@@ -268,15 +293,18 @@ function QuickActionLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-2.5 px-3 py-2.5 rounded-md border border-border/60 bg-card hover:bg-muted/60 hover:border-border transition-colors group text-sm"
+      className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border/60 bg-white hover:bg-primary/5 hover:border-primary/30 transition-all group text-sm"
     >
-      <Icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-      <span className="font-medium text-foreground flex-1">{label}</span>
+      <div className="p-1.5 rounded-md bg-muted group-hover:bg-primary/10 transition-colors flex-shrink-0">
+        <Icon className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+      </div>
+      <span className="font-medium text-foreground flex-1 text-[13px]">{label}</span>
       {typeof badge === "number" && badge > 0 && (
         <Badge className="bg-primary text-primary-foreground text-[10px] h-4 px-1.5 min-w-4 flex items-center justify-center">
           {badge}
         </Badge>
       )}
+      <ArrowRight className="h-3 w-3 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
     </Link>
   );
 }

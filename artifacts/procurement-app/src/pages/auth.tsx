@@ -1,57 +1,131 @@
 import { SignIn, SignUp } from "@clerk/react";
+import { Building2, ShieldCheck, Zap, TrendingUp } from "lucide-react";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-function AuthShell({ children }: { children: React.ReactNode }) {
+const CLERK_APPEARANCE = {
+  elements: {
+    rootBox: "w-full",
+    card: "shadow-none border-0 p-0 bg-transparent",
+    headerTitle: "hidden",
+    headerSubtitle: "hidden",
+    socialButtonsBlockButton:
+      "border border-border bg-white hover:bg-muted text-foreground font-medium rounded-lg",
+    formButtonPrimary:
+      "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg",
+    formFieldInput:
+      "border-border bg-white text-foreground rounded-lg focus:ring-primary",
+    footerActionText: "text-muted-foreground",
+    footerActionLink: "text-primary font-semibold hover:text-primary/80",
+    identityPreviewEditButton: "text-primary",
+    dividerLine: "bg-border",
+    dividerText: "text-muted-foreground text-xs",
+  },
+};
+
+const FEATURES = [
+  { icon: Zap,         label: "RFQ to PO in minutes",       sub: "Streamlined procurement workflow" },
+  { icon: ShieldCheck, label: "Multi-level approvals",       sub: "Role-based access control"        },
+  { icon: TrendingUp,  label: "Real-time spend analytics",   sub: "Reports & vendor scorecards"      },
+];
+
+const STATS = [
+  { value: "500+", label: "Vendors" },
+  { value: "₹12L+", label: "Spend managed" },
+  { value: "94%",  label: "On-time POs" },
+];
+
+function AuthShell({ children, subtitle }: { children: React.ReactNode; subtitle: string }) {
   return (
     <div className="min-h-[100dvh] flex bg-background">
-      <div className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+
+      {/* Left panel — dark navy */}
+      <div
+        className="hidden lg:flex lg:w-[42%] xl:w-2/5 flex-col justify-between p-10 xl:p-14 sidebar-gradient"
+        style={{ borderRight: "1px solid hsl(222 47% 17%)" }}
+      >
+        {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary-foreground/20 flex items-center justify-center font-black text-primary-foreground text-lg">
-            VB
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg">
+            <Building2 className="h-5 w-5 text-white" />
           </div>
-          <span className="font-bold text-xl tracking-tight">VendorBridge</span>
+          <div>
+            <span className="font-bold text-[17px] text-white tracking-tight leading-none">Procuris</span>
+            <div className="text-[10px] text-slate-500 font-medium">Enterprise</div>
+          </div>
         </div>
+
+        {/* Hero text */}
         <div>
-          <blockquote className="text-2xl font-light leading-snug mb-6 opacity-90">
-            "Streamlining procurement from RFQ to payment — all in one place."
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-blue-400 mb-4">
+            Procurement Intelligence
+          </p>
+          <blockquote className="text-2xl xl:text-3xl font-semibold text-white leading-snug mb-8">
+            Streamline procurement
+            <br />
+            <span className="text-blue-400">from RFQ to payment</span>
+            <br />
+            — all in one place.
           </blockquote>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center text-sm font-bold">
-              P
-            </div>
-            <div>
-              <div className="font-semibold text-sm">Procuris Enterprise</div>
-              <div className="text-xs opacity-70">Procurement Management Platform</div>
-            </div>
+
+          {/* Feature list */}
+          <div className="space-y-4 mb-10">
+            {FEATURES.map(({ icon: Icon, label, sub }) => (
+              <div key={label} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center flex-shrink-0">
+                  <Icon className="h-4 w-4 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{label}</p>
+                  <p className="text-[11px] text-slate-500">{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 pt-8 border-t border-white/[0.08]">
+            {STATS.map(({ value, label }) => (
+              <div key={label} className="text-center">
+                <div className="text-xl font-bold text-white">{value}</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">{label}</div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 text-center opacity-80">
-          <div>
-            <div className="text-2xl font-bold">500+</div>
-            <div className="text-xs mt-0.5">Vendors</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold">₹12L+</div>
-            <div className="text-xs mt-0.5">Spend Managed</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold">94%</div>
-            <div className="text-xs mt-0.5">On-time POs</div>
-          </div>
-        </div>
+
+        {/* Footer */}
+        <p className="text-[10px] text-slate-600">
+          © {new Date().getFullYear()} Procuris. Enterprise procurement platform.
+        </p>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center items-center py-12 px-4">
-        <div className="w-full max-w-md">
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-black text-2xl shadow-lg mb-4">
-              VB
+      {/* Right panel — form */}
+      <div className="flex-1 flex flex-col justify-center items-center py-12 px-6 bg-background">
+        <div className="w-full max-w-[400px]">
+
+          {/* Mobile brand */}
+          <div className="flex flex-col items-center mb-8 lg:hidden">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg mb-3">
+              <Building2 className="h-6 w-6 text-white" />
             </div>
-            <div className="lg:hidden text-center mb-2">
-              <span className="font-bold text-xl tracking-tight text-foreground">VendorBridge</span>
+            <span className="font-bold text-lg tracking-tight text-foreground">Procuris</span>
+          </div>
+
+          {/* Desktop icon */}
+          <div className="hidden lg:flex justify-center mb-6">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg">
+              <Building2 className="h-6 w-6 text-white" />
             </div>
           </div>
+
+          <div className="text-center mb-7">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">{subtitle}</h2>
+            <p className="text-muted-foreground text-sm mt-1.5">
+              Procuris · Enterprise Procurement Platform
+            </p>
+          </div>
+
           {children}
         </div>
       </div>
@@ -61,31 +135,12 @@ function AuthShell({ children }: { children: React.ReactNode }) {
 
 export function SignInPage() {
   return (
-    <AuthShell>
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h2>
-        <p className="text-muted-foreground text-sm mt-1.5">Sign in to your procurement platform</p>
-      </div>
+    <AuthShell subtitle="Welcome back">
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
         signUpUrl={`${basePath}/sign-up`}
-        appearance={{
-          elements: {
-            rootBox: "w-full",
-            card: "shadow-none border rounded-xl p-0 bg-transparent",
-            headerTitle: "hidden",
-            headerSubtitle: "hidden",
-            socialButtonsBlockButton: "border border-border bg-background hover:bg-muted text-foreground font-medium",
-            formButtonPrimary: "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold",
-            formFieldInput: "border-border bg-background text-foreground rounded-lg",
-            footerActionText: "text-muted-foreground",
-            footerActionLink: "text-primary font-medium hover:text-primary/80",
-            identityPreviewEditButton: "text-primary",
-            dividerLine: "bg-border",
-            dividerText: "text-muted-foreground",
-          },
-        }}
+        appearance={CLERK_APPEARANCE}
       />
     </AuthShell>
   );
@@ -93,30 +148,12 @@ export function SignInPage() {
 
 export function SignUpPage() {
   return (
-    <AuthShell>
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Create your account</h2>
-        <p className="text-muted-foreground text-sm mt-1.5">Join VendorBridge to manage procurement end-to-end</p>
-      </div>
+    <AuthShell subtitle="Create your account">
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
         signInUrl={`${basePath}/sign-in`}
-        appearance={{
-          elements: {
-            rootBox: "w-full",
-            card: "shadow-none border-0 p-0 bg-transparent",
-            headerTitle: "hidden",
-            headerSubtitle: "hidden",
-            socialButtonsBlockButton: "border border-border bg-background hover:bg-muted text-foreground font-medium",
-            formButtonPrimary: "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold",
-            formFieldInput: "border-border bg-background text-foreground rounded-lg",
-            footerActionText: "text-muted-foreground",
-            footerActionLink: "text-primary font-medium hover:text-primary/80",
-            dividerLine: "bg-border",
-            dividerText: "text-muted-foreground",
-          },
-        }}
+        appearance={CLERK_APPEARANCE}
       />
     </AuthShell>
   );

@@ -16,6 +16,7 @@ import {
   Bell,
   LogOut,
   ChevronDown,
+  Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,15 +28,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { useGetMe } from "@workspace/api-client-react";
 
 interface NavItem {
   title: string;
   href: string;
   icon: React.ElementType;
+  group: string;
 }
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const NAV_ITEMS: NavItem[] = [
+  { title: "Dashboard",       href: "/dashboard",       icon: LayoutDashboard, group: "main" },
+  { title: "Vendors",         href: "/vendors",         icon: Users,           group: "procurement" },
+  { title: "RFQs",            href: "/rfqs",            icon: FileText,        group: "procurement" },
+  { title: "Quotations",      href: "/quotations",      icon: MessageSquare,   group: "procurement" },
+  { title: "Approvals",       href: "/approvals",       icon: CheckSquare,     group: "procurement" },
+  { title: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart,    group: "procurement" },
+  { title: "Invoices",        href: "/invoices",        icon: Receipt,         group: "procurement" },
+  { title: "Reports",         href: "/reports",         icon: BarChart3,       group: "analytics" },
+  { title: "Activity",        href: "/activity-logs",   icon: Activity,        group: "analytics" },
+];
+
+const NAV_GROUPS = [
+  { key: "main",        label: null },
+  { key: "procurement", label: "Procurement" },
+  { key: "analytics",   label: "Analytics" },
+];
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,125 +65,138 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
   const { user: clerkUser } = useUser();
   const { data: user } = useGetMe();
 
-  const navItems: NavItem[] = [
-    { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { title: "Vendors", href: "/vendors", icon: Users },
-    { title: "RFQs", href: "/rfqs", icon: FileText },
-    { title: "Quotations", href: "/quotations", icon: MessageSquare },
-    { title: "Approvals", href: "/approvals", icon: CheckSquare },
-    { title: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart },
-    { title: "Invoices", href: "/invoices", icon: Receipt },
-    { title: "Reports", href: "/reports", icon: BarChart3 },
-    { title: "Activity", href: "/activity-logs", icon: Activity },
-  ];
+  const checkActive = (href: string) =>
+    location === href || location.startsWith(`${href}/`);
+
+  const currentPage = NAV_ITEMS.find((n) => checkActive(n.href));
+
+  const roleLabel = user?.role
+    ? user.role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : "User";
+
+  const initials =
+    clerkUser?.firstName?.charAt(0).toUpperCase() ||
+    user?.name?.charAt(0).toUpperCase() ||
+    "U";
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-muted/40">
+    <div className="flex h-[100dvh] overflow-hidden bg-background">
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/30 md:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Dark navy sidebar ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-56 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:flex-shrink-0
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
+        className={`fixed inset-y-0 left-0 z-50 w-60 flex flex-col sidebar-gradient border-r border-[hsl(222_47%_17%)] transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:flex-shrink-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Logo */}
-        <div className="h-14 flex items-center px-5 border-b border-sidebar-border">
+        {/* Brand / Logo */}
+        <div className="h-14 flex items-center px-4 border-b border-[hsl(222_47%_17%)] flex-shrink-0">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2.5 font-bold text-base tracking-tight hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+            onClick={() => setSidebarOpen(false)}
           >
-            <div className="bg-primary text-primary-foreground w-7 h-7 rounded-md flex items-center justify-center text-xs font-extrabold">
-              VB
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg flex-shrink-0">
+              <Building2 className="h-4 w-4 text-white" />
             </div>
-            <span className="text-sidebar-foreground">VendorBridge</span>
+            <div className="flex flex-col leading-none gap-0.5">
+              <span className="text-[13px] font-bold text-white tracking-tight">Procuris</span>
+              <span className="text-[10px] text-slate-500 font-medium">Enterprise</span>
+            </div>
           </Link>
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden ml-auto h-7 w-7 text-sidebar-foreground"
+            className="md:hidden ml-auto h-7 w-7 text-slate-400 hover:text-white hover:bg-white/10"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 py-3 px-3 overflow-y-auto space-y-0.5">
-          {navItems.map((item) => {
-            const isActive =
-              location === item.href ||
-              location.startsWith(`${item.href}/`);
-            const Icon = item.icon;
+        {/* Navigation */}
+        <nav className="flex-1 py-4 px-3 overflow-y-auto space-y-5">
+          {NAV_GROUPS.map(({ key, label }) => {
+            const items = NAV_ITEMS.filter((i) => i.group === key);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                    : "text-sidebar-foreground/60 hover:bg-muted hover:text-sidebar-foreground"
-                }`}
-              >
-                <Icon
-                  className={`h-4 w-4 flex-shrink-0 ${
-                    isActive ? "text-sidebar-primary" : ""
-                  }`}
-                />
-                {item.title}
-              </Link>
+              <div key={key}>
+                {label && (
+                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-600 px-3 mb-2">
+                    {label}
+                  </p>
+                )}
+                <div className="space-y-0.5">
+                  {items.map((item) => {
+                    const active = checkActive(item.href);
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`flex items-center gap-2.5 pl-2.5 pr-3 py-[7px] rounded-lg text-[13px] font-medium transition-all group
+                          ${active
+                            ? "sidebar-item-active text-white"
+                            : "sidebar-item-inactive text-slate-400 hover:text-slate-100"
+                          }`}
+                      >
+                        <Icon
+                          className={`h-[15px] w-[15px] flex-shrink-0 transition-colors ${
+                            active
+                              ? "text-blue-400"
+                              : "text-slate-500 group-hover:text-slate-300"
+                          }`}
+                        />
+                        <span className="truncate">{item.title}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </nav>
 
-        {/* User Footer */}
-        <div className="p-3 border-t border-sidebar-border">
+        {/* User footer */}
+        <div className="px-3 pb-4 pt-3 border-t border-[hsl(222_47%_17%)] flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-start px-2 py-2 h-auto hover:bg-muted text-sidebar-foreground"
-              >
-                <Avatar className="h-7 w-7 mr-2.5 border border-border">
+              <button className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-white/[0.06] transition-colors group text-left">
+                <Avatar className="h-7 w-7 flex-shrink-0 ring-2 ring-blue-600/40">
                   <AvatarImage src={clerkUser?.imageUrl} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {clerkUser?.firstName?.charAt(0) || user?.name?.charAt(0) || "U"}
+                  <AvatarFallback className="bg-blue-700 text-white text-xs font-bold">
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col items-start overflow-hidden mr-auto">
-                  <span className="text-xs font-semibold truncate w-full">
-                    {clerkUser?.fullName || user?.name || "Loading..."}
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-[12px] font-semibold text-slate-200 truncate leading-tight">
+                    {clerkUser?.fullName || user?.name || "Loading…"}
                   </span>
-                  <span className="text-[10px] text-muted-foreground truncate w-full capitalize">
-                    {user?.role ? user.role.replace("_", " ") : "User"}
-                  </span>
+                  <span className="text-[10px] text-slate-500 truncate capitalize">{roleLabel}</span>
                 </div>
-                <ChevronDown className="h-3.5 w-3.5 opacity-40 flex-shrink-0" />
-              </Button>
+                <ChevronDown className="h-3 w-3 text-slate-600 flex-shrink-0 group-hover:text-slate-400 transition-colors" />
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuContent align="end" side="top" className="w-52 mb-1">
+              <DropdownMenuLabel className="text-xs">My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <div className="px-2 py-1.5 text-xs text-muted-foreground flex flex-col gap-1">
-                <span className="truncate">{user?.email}</span>
+              <div className="px-2 py-1.5 space-y-0.5">
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                 {user?.companyName && (
-                  <span className="truncate font-medium text-foreground">
-                    {user.companyName}
-                  </span>
+                  <p className="text-xs font-semibold truncate">{user.companyName}</p>
                 )}
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-destructive focus:bg-destructive focus:text-destructive-foreground cursor-pointer"
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer text-xs"
                 onClick={() => signOut({ redirectUrl: basePath || "/" })}
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-3.5 w-3.5 mr-2" />
                 Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -170,37 +204,56 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* ── Main content ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
         {/* Top bar */}
-        <header className="h-14 flex items-center justify-between px-4 sm:px-6 border-b border-border bg-card shadow-sm z-10 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden text-muted-foreground h-8 w-8"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="hidden md:block text-sm font-medium text-muted-foreground">
-            Procurement Management System
+        <header className="h-14 flex items-center justify-between px-4 sm:px-6 bg-white border-b border-border shadow-[0_1px_3px_0_rgba(15,23,42,0.06)] z-10 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-muted-foreground h-8 w-8"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            {currentPage && (
+              <div className="hidden md:flex items-center gap-2">
+                <currentPage.icon className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-semibold text-foreground">{currentPage.title}</span>
+              </div>
+            )}
           </div>
-          <div className="ml-auto flex items-center gap-2">
+
+          <div className="flex items-center gap-2">
+            {user?.role && (
+              <Badge
+                variant="outline"
+                className="hidden sm:flex text-[10px] font-semibold capitalize border-blue-200 text-blue-700 bg-blue-50 px-2 py-0.5"
+              >
+                {roleLabel}
+              </Badge>
+            )}
             <Button
               variant="ghost"
               size="icon"
               className="relative text-muted-foreground hover:text-foreground h-8 w-8"
             >
               <Bell className="h-4 w-4" />
-              <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-destructive border border-card" />
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 border border-white" />
             </Button>
-            <div className="text-xs text-muted-foreground hidden sm:block">
-              {user?.name || clerkUser?.fullName || ""}
-            </div>
+            <Avatar className="h-7 w-7 ring-1 ring-border cursor-pointer">
+              <AvatarImage src={clerkUser?.imageUrl} />
+              <AvatarFallback className="bg-blue-700 text-white text-[10px] font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {/* Page */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>
